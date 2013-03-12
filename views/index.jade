@@ -1,0 +1,25 @@
+extends layout
+
+block templates
+    script#message-template(type='text/x-handlebars-template')
+        li.message='{{name}} says: {{message}}'
+
+    script#self-message-template(type='text/x-handlebars-template')
+        li.self-message='{{name}} says: {{message}}'
+
+    script#conversation-template(type='text/x-handlebars-template')
+        li(id='conversation-{{id}}')
+            h3='{{subject}}'
+            input.message(type='text')
+            a(onClick="say('{{id}}')")='Say'
+            ul
+
+block content
+    p
+        input#name(type='text')
+        a#rename='Rename'
+    p
+        input#subject(type='text')
+        a#start-conversation='Start Conversation'
+    div
+        ul#conversations
