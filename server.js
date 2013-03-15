@@ -2,7 +2,8 @@
 var connect = require('connect')
     , express = require('express')
     , io = require('socket.io')
-    , port = (process.env.PORT || 8081);
+    , port = (process.env.PORT || 8081)
+    , scrollback = 100;
 
 //Setup Express
 var server = express.createServer();
@@ -16,7 +17,7 @@ server.configure(function(){
     server.use(server.router);
 });
 
-var uuid = 0;
+var scrollbackBuffer = [];
 
 //setup the errors
 server.error(function(err, req, res, next){
@@ -46,28 +47,27 @@ io.sockets.on('connection', function(socket){
 
     // everyone starts off anon
     socket.username = 'anon';
-    socket.broadcast.emit('join', { name: 'anon' });
-    socket.emit('join', { name: 'anon' });
+
+    // send recent scrollbackBuffer
+    for (var i = 0; i < scrollbackBuffer.length; i++)
+        socket.emit('said', scrollbackBuffer[i]);
 
     socket.on('rename', function(data) {
         data.name = socket.username;
         socket.username = data.newName;
-
-        socket.broadcast.emit('rename', data);
-        socket.emit('rename', data);
-    });
-
-    socket.on('start_conversation', function(data) {
-        data.name = socket.username;
-        data.id = uuid++;
-        socket.broadcast.emit('start_conversation', data);
-        socket.emit('start_conversation', data);
     });
 
     socket.on('say', function(data){
         data.name = socket.username;
-        socket.broadcast.emit('she_said', data);
-        socket.emit('i_said', data);
+
+        // save data to scrollback and trim scrollback to size
+        scrollbackBuffer.push(data);
+        scrollbackBuffer = scrollbackBuffer.splice(-scrollback, scrollback);
+
+        socket.broadcast.emit('said', data);
+
+        data.mine = true;
+        socket.emit('said', data);
     });
 
     socket.on('disconnect', function(){
@@ -83,7 +83,7 @@ io.sockets.on('connection', function(socket){
 
 /////// ADD ALL YOUR ROUTES HERE  /////////
 
-server.get('/*', function(req,res){
+server.get('/', function(req,res){
     res.render('index.jade', {
         locals : {
             title : 'Your Page Title'

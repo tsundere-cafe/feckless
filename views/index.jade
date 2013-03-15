@@ -2,24 +2,32 @@ extends layout
 
 block templates
     script#message-template(type='text/x-handlebars-template')
-        li.message='{{name}} says: {{message}}'
-
-    script#self-message-template(type='text/x-handlebars-template')
-        li.self-message='{{name}} says: {{message}}'
+        li='{{name}}: {{message}}'
 
     script#conversation-template(type='text/x-handlebars-template')
-        li(id='conversation-{{id}}')
-            h3='{{subject}}'
-            input.message(type='text')
-            a(onClick="say('{{id}}')")='Say'
-            ul
+        li.conversation
+            div
+                span.subject='{{subject}}'
+                div.conversation-controls
+                    a.hide(href='#')='[hide]'
+                    a.unhide(href='#')='[unhide]'
+                    a.pin(href='#')='[pin]'
+                    a.unpin(href='#')='[unpin]'
+            div
+                input.message(type='text', size='80')
+                input.say(type='submit', value='Say')
+                ul
 
 block content
-    p
-        input#name(type='text')
-        a#rename='Rename'
-    p
-        input#subject(type='text')
-        a#start-conversation='Start Conversation'
-    div
-        ul#conversations
+    div#container
+        div#header Pee Drinkers Anonymous
+        div#rename name:
+            input#name(type='text')
+        div#start-conversation-block subject:
+            input#subject(type='text', size='80')
+            input#start-conversation(type='submit', value='Start Conversation')
+        div#instructions how to do things: change your name to something then pin a conversation to talk in it
+        div
+            ul#pinned
+            ul#preview
+            ul#hidden

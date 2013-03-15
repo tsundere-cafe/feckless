@@ -1,0 +1,56 @@
+ul { list-style-type: none; margin: 0; padding: 0; }
+
+body { background: #000a0f; color: white; }
+
+#container { padding: 0 20%; }
+#rename { text-align: right; margin: 1em; }
+#header { font-size: 3em; text-align: center; }
+#instructions { text-align: center; width: 60%; margin: 1em auto; }
+
+.conversation-controls { float: right; }
+.subject { font-size: 1.25em; font-weight: 600; padding-right: 5px; }
+.message { width: 80%; }
+#subject { width: 50%; }
+.hide { padding: 0 2px; }
+.unhide { padding: 0 2px; }
+.pin { padding: 0 2px; }
+.unpin { padding: 0 2px; }
+
+#pinned .conversation { background: #334; color: #fff; }
+#preview .conversation { background: #223; color: #88a; }
+#hidden .conversation { background: #112; color: #446; }
+
+.conversation { padding: 5px; margin: 5px; border-radius: 5px; }
+.conversation li { padding: 5px 0; }
+
+#pinned { padding: 5px 0; }
+#preview { padding: 5px 0; }
+#hidden { padding: 5px 0; }
+
+#pinned .conversation li:nth-last-of-type(even) { background: #556; }
+#preview .conversation li:nth-last-of-type(even) { background: #334; }
+
+#pinned .conversation li:nth-of-type(n+21) { display: none; }
+#preview .conversation li:nth-of-type(n+5) { display: none; }
+#preview .conversation li { white-space: nowrap; overflow: hidden; width: 100%; text-overflow: ellipsis; }
+#hidden .conversation li { display: none; }
+
+#preview .conversation .message { display: none; }
+#preview .conversation .say { display: none; }
+
+#hidden .conversation .message { display: none; }
+#hidden .conversation .say { display: none; }
+
+#pinned .hide { display: none; }
+#pinned .unhide { display: none; }
+#pinned .pin { display: none; }
+#preview .unhide { display: none; }
+#preview .unpin { display: none; }
+#hidden .hide { display: none; }
+#hidden .unpin { display: none; }
+#hidden .pin { display: none; }
+
+a:link {color:#ffaa00;}      /* unvisited link */
+a:visited {color:#ffaa00;}  /* visited link */
+a:hover {color:#ffaa00;}  /* mouse over link */
+a:active {color:#ffaa00;}  /* selected link */
