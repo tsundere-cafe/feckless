@@ -50,6 +50,11 @@ $(document).ready(function() {
         conversation.find('.unpin').bind('click', function() { moveTo(subject, 'preview'); return false; });
         conversation.find('.unhide').bind('click', function() { moveTo(subject, 'preview'); return false; });
 
+        conversation.find('.message').keyup(function(event) {
+            if (event.keyCode == 13)
+                conversation.find('.say').click();
+        });
+
         conversation.find('.say').bind('click', function() {
             socket.emit('say', {
                 message: conversation.find('.message').val(),
