@@ -18,6 +18,7 @@ server.configure(function(){
 });
 
 var scrollbackBuffer = [];
+var members = [];
 
 //setup the errors
 server.error(function(err, req, res, next){
@@ -59,8 +60,20 @@ io.sockets.on('connection', function(socket){
         socket.emit('said', scrollbackBuffer[i]);
 
     socket.on('rename', function(data) {
+        // remove old name from names
+        if (socket.username) {
+            for (var i = 0; i < members.length; i++)
+                if (members[i] === socket.username) {
+                    members.splice(i, 1);
+                    break;
+                }
+        }
         data.name = socket.username;
         socket.username = data.newName;
+
+        members.push(socket.username);
+        socket.emit('members', members);
+        socket.broadcast.emit('members', members);
     });
 
     socket.on('say', function(data){
@@ -77,7 +90,15 @@ io.sockets.on('connection', function(socket){
     });
 
     socket.on('disconnect', function(){
-        socket.broadcast.emit('part', { name: socket.username });
+        // remove old name from names
+        if (socket.username) {
+            for (var i = 0; i < members.length; i++)
+                if (members[i] === socket.username) {
+                    members.splice(i, 1);
+                    break;
+                }
+        }
+        socket.broadcast.emit('members', members);
         console.log('Client Disconnected.');
     });
 });

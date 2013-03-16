@@ -5,7 +5,17 @@ body { background: #000a0f; color: white; }
 #container { padding: 0 20%; }
 #rename { text-align: right; margin: 1em; }
 #header { font-size: 3em; text-align: center; }
-#instructions { text-align: center; width: 60%; margin: 1em auto; }
+#instructions { width: 60%; margin: 1em auto; }
+#show-instructions { text-align: center; }
+
+#members li {
+    display: inline;
+    padding: 0 0 0 5px;
+    margin: 0 0 0 5px;
+    border-style: none none none dotted;
+    border-width: 1px;
+}
+#members li:first-of-type { border-style: none; }
 
 .conversation-controls { float: right; }
 .subject { font-size: 1.25em; font-weight: 600; padding-right: 5px; }

@@ -2,7 +2,7 @@
   "name": "YOUR-PROJECT-NAME-HERE",
   "description": "YOUR PROJECT DESCRIPTION HERE",
   "author": "YOUR NAME <your@emailaddress.com>",
-  "version": "0.0.1-1",
+  "version": "0.0.1-2",
   "dependencies": {
     "connect": "1.8.5",
     "express": "2.5.2",

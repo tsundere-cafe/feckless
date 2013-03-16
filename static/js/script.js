@@ -4,6 +4,8 @@
 $(document).ready(function() {
     var socket = io.connect();
 
+    $('#instructions-body').hide();
+
     var fetch = function(key) {
         if (typeof(Storage) !== "undefined")
             return localStorage[key];
@@ -66,6 +68,7 @@ $(document).ready(function() {
 
     var conversationTemplate = Handlebars.compile($("#conversation-template").html());
     var messageTemplate = Handlebars.compile($("#message-template").html());
+    var nameTemplate = Handlebars.compile($("#name-template").html());
 
     $('#name').val(fetch('name') || '（　｀ー´）');
     socket.emit('rename', { newName: $('#name').val() });
@@ -77,7 +80,13 @@ $(document).ready(function() {
 
     $('#start-conversation').bind('click', function() {
         bumpOrCreate($('#subject').val(), 'pinned');
+        moveTo($('#subject').val(), 'pinned');
         $('#subject').val('');
+    });
+
+    $('#show-instructions').bind('click', function() {
+        $('#instructions-body').toggle();
+        return false;
     });
 
     socket.on('said', function(data) {
@@ -86,4 +95,10 @@ $(document).ready(function() {
         var conversation = findBySubject(data.subject);
         conversation.find('ul').prepend(messageTemplate(data));
     });
+
+    socket.on('members', function(data) {
+        $('#members > li').remove();
+        for (var i = 0; i < data.length; i++)
+            $('#members').append(nameTemplate({ name: data[i] }));
+    })
 });

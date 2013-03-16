@@ -1,6 +1,9 @@
 extends layout
 
 block templates
+    script#name-template(type='text/x-handlebars-template')
+        li='{{name}}'
+
     script#message-template(type='text/x-handlebars-template')
         li='{{name}}: {{message}}'
 
@@ -26,7 +29,17 @@ block content
         div#start-conversation-block subject:
             input#subject(type='text', size='80')
             input#start-conversation(type='submit', value='Start Conversation')
-        div#instructions how to do things: change your name to something then pin a conversation to talk in it
+        div#instructions
+            div#show-instructions
+                a(href='#')='[how to do things]'
+            div#instructions-body
+                ol
+                    li change your name to something
+                    li [pin] a conversation to start chatting in it
+        ul#members online now:
+            li people
+            li dogs
+            li trashcans
         div
             ul#pinned
             ul#preview
