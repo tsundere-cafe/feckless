@@ -4,8 +4,6 @@
 $(document).ready(function() {
     var socket = io.connect();
 
-    $('#instructions-body').hide();
-
     var fetch = function(key) {
         if (typeof(Storage) !== "undefined")
             return localStorage[key];
@@ -66,12 +64,26 @@ $(document).ready(function() {
         });
     }
 
+
     var conversationTemplate = Handlebars.compile($("#conversation-template").html());
     var messageTemplate = Handlebars.compile($("#message-template").html());
     var nameTemplate = Handlebars.compile($("#name-template").html());
+    var channelTemplate = Handlebars.compile($("#channel-name-template").html());
+
+
+    var quotes = ['closed sundays and sometimes friday afternoons'];
+    var channel = decodeURIComponent(window.location.pathname).substring(1).replace(/-/g, ' ');
+    socket.emit('subscribe', channel);
+    if (channel)
+        $('#channel-name').html(channelTemplate({ channel: channel }));
+    else
+        $('#channel-name').html(quotes[Math.floor(Math.random() * quotes.length)])
 
     $('#name').val(fetch('name') || '（　｀ー´）');
     socket.emit('rename', { newName: $('#name').val() });
+
+
+    $('#instructions-body').hide();
 
     $('#name').bind('blur', function() {
         socket.emit('rename', { newName: $('#name').val() });
@@ -84,7 +96,7 @@ $(document).ready(function() {
         $('#subject').val('');
     });
 
-    $('#show-instructions').bind('click', function() {
+    $('#show-instructions-button').bind('click', function() {
         $('#instructions-body').toggle();
         return false;
     });
@@ -92,13 +104,27 @@ $(document).ready(function() {
     socket.on('said', function(data) {
         bumpOrCreate(data.subject);
 
+        // format time
+        var d = new Date(data.time);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+        data.time = d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.getFullYear() + ' ' +
+                    d.getHours() + ':' + d.getMinutes() + ':' + (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+
         var conversation = findBySubject(data.subject);
         conversation.find('ul').prepend(messageTemplate(data));
+
+        var last = '';
+        conversation.find('.name-block').each(function() {
+            if ($(this).find('.name').html() == last)
+                $(this).hide();
+
+            last = $(this).find('.name').html();
+        });
     });
 
     socket.on('members', function(data) {
         $('#members > li').remove();
         for (var i = 0; i < data.length; i++)
-            $('#members').append(nameTemplate({ name: data[i] }));
+            $('#members').append(nameTemplate({ trip: data[i] }));
     })
 });

@@ -1,11 +1,23 @@
 extends layout
 
 block templates
+    script#channel-name-template(type='text/x-handlebars-template')
+        | {{channel}}
+
     script#name-template(type='text/x-handlebars-template')
-        li='{{name}}'
+        li
+            span.name='{{trip.name}}'
+            {{#if trip.code}}
+            span.trip='!{{trip.code}}'
+            {{/if}}
 
     script#message-template(type='text/x-handlebars-template')
-        li='{{name}}: {{message}}'
+        li
+            div.name-block
+                span.name='{{trip.name}}'
+                span.trip='!{{trip.code}}'
+                span.timestamp='{{time}}'
+            span.msg='{{message}}'
 
     script#conversation-template(type='text/x-handlebars-template')
         li.conversation
@@ -23,7 +35,8 @@ block templates
 
 block content
     div#container
-        div#header websight
+        div#header=title
+        div#channel-name
         div#rename name:
             input#name(type='text')
         div#start-conversation-block subject:
@@ -31,16 +44,18 @@ block content
             input#start-conversation(type='submit', value='Start Conversation')
         div#instructions
             div#show-instructions
-                a(href='#')='[how to do things]'
+                a#show-instructions-button(href='#')='[how to do things]'
             div#instructions-body
                 ol
                     li change your name to something
+                    li use name#tripcode for authenticity
                     li [pin] a conversation to start chatting in it
                     li if you can't post, you probably want to try chrome
+                    li
+                        | arial 16pt is nice but have you considered installing
+                        a(href='http://en.wikipedia.org/wiki/Mona_Font', target='_blank')='[mona font]'
+                        | ?
         ul#members online now:
-            li people
-            li dogs
-            li trashcans
         div
             ul#pinned
             ul#preview

@@ -2,7 +2,8 @@
 var connect = require('connect')
     , express = require('express')
     , io = require('socket.io')
-    , port = (process.env.PORT || 8081)
+    , crypto = require('crypto')
+    , port = (process.env.PORT || 8000)
     , scrollback = 100;
 
 //Setup Express
@@ -12,31 +13,31 @@ server.configure(function(){
     server.set('view options', { layout: false });
     server.use(connect.bodyParser());
     server.use(express.cookieParser());
-    server.use(express.session({ secret: "shhhhhhhhh!"}));
+    server.use(express.session({ secret: "feed a bee"}));
     server.use(connect.static(__dirname + '/static'));
     server.use(server.router);
 });
 
-var scrollbackBuffer = [];
-var members = [];
+var scrollbackBuffer = {};
+var members = {};
 
 //setup the errors
 server.error(function(err, req, res, next){
     if (err instanceof NotFound) {
         res.render('404.jade', { locals: {
             title : '404 - Not Found'
-            ,description: ''
-            ,author: ''
-            ,analyticssiteid: 'XXXXXXX'
-        },status: 404 });
+            , description: ''
+            , author: ''
+            , analyticssiteid: 'XXXXXXX'
+        }, status: 404 });
     } else {
         res.render('500.jade', { locals: {
             title : 'The Server Encountered an Error'
-            ,description: ''
-            ,author: ''
-            ,analyticssiteid: 'XXXXXXX'
-            ,error: err
-        },status: 500 });
+            , description: ''
+            , author: ''
+            , analyticssiteid: 'XXXXXXX'
+            , error: err
+        }, status: 500 });
     }
 });
 server.listen( port);
@@ -44,61 +45,89 @@ server.listen( port);
 //Setup Socket.IO
 var io = io.listen(server);
 
-io.configure(function () {
-    io.set("transports", ["xhr-polling"]);
-    io.set("polling duration", 10);
-});
+// NOTE: uncomment this if people have problems with socket.io
+// io.configure(function () {
+//     io.set("transports", ["xhr-polling"]);
+//     io.set("polling duration", 10);
+// });
 
 io.sockets.on('connection', function(socket){
     console.log('Client Connected');
 
     // everyone starts off anon
-    socket.username = 'anon';
+    socket.trip = { name: 'anon' };
 
-    // send recent scrollbackBuffer
-    for (var i = 0; i < scrollbackBuffer.length; i++)
-        socket.emit('said', scrollbackBuffer[i]);
+    socket.on('subscribe', function(data) {
+        // join socket to the room
+        console.log('joining ' + socket.trip.name + '!' + socket.trip.code + ' to #' + data);
+        socket.join('#' + data); // prepend # to prevent front page from being falsy and broadcasting everywhere
+        socket.channel = '#' + data;
+
+        scrollbackBuffer[socket.channel] = scrollbackBuffer[socket.channel] || [];
+
+        // send recent scrollbackBuffer but don't send messages who's convo was hidden at the time they were sent
+        for (var i = 0; i < scrollbackBuffer[socket.channel].length; i++)
+            socket.emit('said', scrollbackBuffer[socket.channel][i]);
+    });
 
     socket.on('rename', function(data) {
+        // encrypt tripcode
+        var trip = data.newName.split(/#(.+)/);
+        trip = { name: trip[0], code: trip[1] };
+
+        if (trip.code) {
+            trip.code = crypto.createHmac('SHA256', '').update(trip.code).digest('base64').substring(0, 6);
+        } else {
+            trip.code = '--';
+        }
+
+        members[socket.channel] = members[socket.channel] || [];
+
         // remove old name from names
-        if (socket.username) {
-            for (var i = 0; i < members.length; i++)
-                if (members[i] === socket.username) {
-                    members.splice(i, 1);
+        if (socket.trip) {
+            for (var i = 0; i < members[socket.channel].length; i++)
+                if (members[socket.channel][i].name === socket.trip.name && members[socket.channel][i].code === socket.trip.code) {
+                    members[socket.channel].splice(i, 1);
                     break;
                 }
         }
-        data.name = socket.username;
-        socket.username = data.newName;
 
-        members.push(socket.username);
-        socket.emit('members', members);
-        socket.broadcast.emit('members', members);
+        socket.trip = trip;
+        members[socket.channel].push(trip);
+        socket.emit('members', members[socket.channel]);
+        socket.broadcast.to(socket.channel).emit('members', members[socket.channel]);
     });
 
     socket.on('say', function(data){
-        data.name = socket.username;
+        if (data.message.match(/^\s*$/))
+            return;
+
+        data.trip = socket.trip;
+        data.time = 3000000000000 - new Date().getTime();
+
+        scrollbackBuffer[socket.channel] = scrollbackBuffer[socket.channel] || [];
 
         // save data to scrollback and trim scrollback to size
-        scrollbackBuffer.push(data);
-        scrollbackBuffer = scrollbackBuffer.splice(-scrollback, scrollback);
+        scrollbackBuffer[socket.channel].push(data);
+        scrollbackBuffer[socket.channel] = scrollbackBuffer[socket.channel].splice(-scrollback, scrollback);
 
-        socket.broadcast.emit('said', data);
-
-        data.mine = true;
+        socket.broadcast.to(socket.channel).emit('said', data);
         socket.emit('said', data);
     });
 
     socket.on('disconnect', function(){
+        console.log('disconnecting ' + socket.trip.name + '!' + socket.trip.code + ' from ' + socket.channel);
+        members[socket.channel] = members[socket.channel] || [];
+
         // remove old name from names
-        if (socket.username) {
-            for (var i = 0; i < members.length; i++)
-                if (members[i] === socket.username) {
-                    members.splice(i, 1);
+        if (socket.trip) {
+            for (var i = 0; i < members[socket.channel].length; i++)
+                if (members[socket.channel][i].name === socket.trip.name && members[socket.channel][i].code === socket.trip.code) {
+                    members[socket.channel].splice(i, 1);
                     break;
                 }
         }
-        socket.broadcast.emit('members', members);
+        socket.broadcast.to(socket.channel).emit('members', members[socket.channel]);
         console.log('Client Disconnected.');
     });
 });
@@ -110,32 +139,33 @@ io.sockets.on('connection', function(socket){
 
 /////// ADD ALL YOUR ROUTES HERE  /////////
 
-server.get('/', function(req,res){
+server.get('/*', function(req,res){
     res.render('index.jade', {
         locals : {
-            title : 'Your Page Title'
-            ,description: 'Your Page Description'
-            ,author: 'Your Name'
-            ,analyticssiteid: 'XXXXXXX'
+            title : 'Futuristic Chat BBS'
+            , description: ''
+            , author: ''
+            , analyticssiteid: 'XXXXXXX'
         }
     });
 });
 
-//A Route for Creating a 500 Error (Useful to keep around)
-server.get('/500', function(req, res){
-    throw new Error('This is a 500 Error');
-});
+// uhm, nothing is ever not found...
 
-//The 404 Route (ALWAYS Keep this as the last route)
-server.get('/*', function(req, res){
-    throw new NotFound;
-});
+////A Route for Creating a 500 Error (Useful to keep around)
+//server.get('/500', function(req, res){
+//    throw new Error('This is a 500 Error');
+//});
+//
+////The 404 Route (ALWAYS Keep this as the last route)
+//server.get('/*', function(req, res){
+//    throw new NotFound;
+//});
 
 function NotFound(msg){
     this.name = 'NotFound';
     Error.call(this, msg);
     Error.captureStackTrace(this, arguments.callee);
 }
-
 
 console.log('Listening on http://0.0.0.0:' + port );

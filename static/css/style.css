@@ -1,10 +1,11 @@
 ul { list-style-type: none; margin: 0; padding: 0; }
 
-body { background: #000a0f; color: white; }
+body { background: #000a0f; color: white; font-family: sans-serif; }
 
 #container { padding: 0 20%; }
 #rename { text-align: right; margin: 1em; }
 #header { font-size: 3em; text-align: center; }
+#channel-name { font-size: 2em; text-align: center; }
 #instructions { width: 60%; margin: 1em auto; }
 #show-instructions { text-align: center; }
 
@@ -16,6 +17,7 @@ body { background: #000a0f; color: white; }
     border-width: 1px;
 }
 #members li:first-of-type { border-style: none; }
+#members .trip { color: #557; }
 
 .conversation-controls { float: right; }
 .subject { font-size: 1.25em; font-weight: 600; padding-right: 5px; }
@@ -31,14 +33,21 @@ body { background: #000a0f; color: white; }
 #hidden .conversation { background: #112; color: #446; }
 
 .conversation { padding: 5px; margin: 5px; border-radius: 5px; }
-.conversation li { padding: 5px 0; }
+.conversation li { padding: .1em 0; }
 
 #pinned { padding: 5px 0; }
 #preview { padding: 5px 0; }
 #hidden { padding: 5px 0; }
 
-#pinned .conversation li:nth-last-of-type(even) { background: #556; }
-#preview .conversation li:nth-last-of-type(even) { background: #334; }
+#pinned .timestamp { margin-left: 1em; color: #aca; }
+#preview .timestamp { margin-left: 1em; color: #8a8; }
+
+.name-block { margin-top: .5em; margin-bottom: .2em; }
+#pinned .name { font-weight: bold; color: #caa; }
+#preview .name { font-weight: bold; color: #a88; }
+
+#pinned .trip { margin-left: .1em; color: #aac; }
+#preview .trip { margin-left: .1em; color: #88a; }
 
 #pinned .conversation li:nth-of-type(n+21) { display: none; }
 #preview .conversation li:nth-of-type(n+5) { display: none; }
