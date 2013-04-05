@@ -108,7 +108,9 @@ $(document).ready(function() {
         var d = new Date(data.time);
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
         data.time = d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.getFullYear() + ' ' +
-                    d.getHours() + ':' + d.getMinutes() + ':' + (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+                    d.getHours() + ':' +
+                    (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() + ':' +
+                    (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
 
         var conversation = findBySubject(data.subject);
         conversation.find('ul').prepend(messageTemplate(data));

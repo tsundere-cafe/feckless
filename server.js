@@ -4,7 +4,8 @@ var connect = require('connect')
     , io = require('socket.io')
     , crypto = require('crypto')
     , port = (process.env.PORT || 8000)
-    , scrollback = 100;
+    , scrollback = 200
+    , config = require('./config.json');
 
 //Setup Express
 var server = express.createServer();
@@ -76,7 +77,7 @@ io.sockets.on('connection', function(socket){
         trip = { name: trip[0], code: trip[1] };
 
         if (trip.code) {
-            trip.code = crypto.createHmac('SHA256', '').update(trip.code).digest('base64').substring(0, 6);
+            trip.code = crypto.createHmac('SHA256', config.salt).update(trip.code).digest('base64').substring(0, 6);
         } else {
             trip.code = '--';
         }

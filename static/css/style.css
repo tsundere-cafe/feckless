@@ -1,6 +1,11 @@
 ul { list-style-type: none; margin: 0; padding: 0; }
 
-body { background: #000a0f; color: white; font-family: sans-serif; }
+@font-face {
+    font-family: HostedMona;
+    src: local("Mona"), url(fonts/ipagp-mona.ttf);
+}
+
+body { background: #000a0f; color: white; font-family: HostedMona !important; }
 
 #container { padding: 0 20%; }
 #rename { text-align: right; margin: 1em; }
@@ -16,11 +21,12 @@ body { background: #000a0f; color: white; font-family: sans-serif; }
     border-style: none none none dotted;
     border-width: 1px;
 }
+
 #members li:first-of-type { border-style: none; }
 #members .trip { color: #557; }
 
 .conversation-controls { float: right; }
-.subject { font-size: 1.25em; font-weight: 600; padding-right: 5px; }
+.subject { font-size: 1.25em; padding-right: 5px; }
 .message { width: 80%; }
 #subject { width: 50%; }
 .hide { padding: 0 2px; }
