@@ -77,7 +77,10 @@ io.sockets.on('connection', function(socket){
         trip = { name: trip[0], code: trip[1] };
 
         if (trip.code) {
-            trip.code = crypto.createHmac('SHA256', config.salt).update(trip.code).digest('base64').substring(0, 6);
+                if (trip.code == config.modtrip)
+                    trip.code = 'MOD';
+                else
+                    trip.code = crypto.createHmac('SHA256', config.salt).update(trip.code).digest('base64').substring(0, 6);
         } else {
             trip.code = '--';
         }
@@ -143,7 +146,7 @@ io.sockets.on('connection', function(socket){
 server.get('/*', function(req,res){
     res.render('index.jade', {
         locals : {
-            title : 'Futuristic Chat BBS'
+            title : config.title
             , description: ''
             , author: ''
             , analyticssiteid: 'XXXXXXX'
