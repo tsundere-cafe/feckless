@@ -115,12 +115,14 @@ $(document).ready(function() {
         var conversation = findBySubject(data.subject);
         conversation.find('ul').prepend(messageTemplate(data));
 
-        var last = '';
+        var lastname = '';
+        var lasttrip = '';
         conversation.find('.name-block').each(function() {
-            if ($(this).find('.name').html() == last)
+            if ($(this).find('.name').html() == lastname && $(this).find('.trip').html() == lasttrip)
                 $(this).hide();
 
-            last = $(this).find('.name').html();
+            lastname = $(this).find('.name').html();
+            lasttrip = $(this).find('.trip').html();
         });
     });
 
