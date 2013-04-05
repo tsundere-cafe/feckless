@@ -2,7 +2,7 @@ ul { list-style-type: none; margin: 0; padding: 0; }
 
 @font-face {
     font-family: HostedMona;
-    src: local("Mona"), url(fonts/ipagp-mona.ttf);
+    src: local('Mona'), local('MS PGothic'), url(fonts/ipagp-mona.ttf);
 }
 
 body { background: #000a0f; color: white; font-family: HostedMona !important; }
@@ -39,7 +39,7 @@ body { background: #000a0f; color: white; font-family: HostedMona !important; }
 #hidden .conversation { background: #112; color: #446; }
 
 .conversation { padding: 5px; margin: 5px; border-radius: 5px; }
-.conversation li { padding: .1em 0; }
+.conversation li { padding: .2em 0; }
 
 #pinned { padding: 5px 0; }
 #preview { padding: 5px 0; }

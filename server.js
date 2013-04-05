@@ -4,7 +4,7 @@ var connect = require('connect')
     , io = require('socket.io')
     , crypto = require('crypto')
     , port = (process.env.PORT || 8000)
-    , scrollback = 200
+    , scrollback = 100
     , config = require('./config.json');
 
 //Setup Express
@@ -107,7 +107,7 @@ io.sockets.on('connection', function(socket){
             return;
 
         data.trip = socket.trip;
-        data.time = 3000000000000 - new Date().getTime();
+        data.time = 2000000000000 - new Date().getTime();
 
         scrollbackBuffer[socket.channel] = scrollbackBuffer[socket.channel] || [];
 
