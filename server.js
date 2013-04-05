@@ -107,7 +107,7 @@ io.sockets.on('connection', function(socket){
             return;
 
         data.trip = socket.trip;
-        data.time = 2000000000000 - new Date().getTime();
+        data.time = new Date().getTime();
 
         scrollbackBuffer[socket.channel] = scrollbackBuffer[socket.channel] || [];
 

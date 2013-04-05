@@ -71,7 +71,7 @@ $(document).ready(function() {
     var channelTemplate = Handlebars.compile($("#channel-name-template").html());
 
 
-    var quotes = ['closed sundays and sometimes friday afternoons'];
+    var quotes = [''];
     var channel = decodeURIComponent(window.location.pathname).substring(1).replace(/-/g, ' ');
     socket.emit('subscribe', channel);
     if (channel)
